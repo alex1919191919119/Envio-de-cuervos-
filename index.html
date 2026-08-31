@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consejo Negro RPG - La Casa del Dragón</title>
+    <style>
+        body { 
+            background: radial-gradient(circle at top center, #3a0808 0%, #050505 100%);
+            background-attachment: fixed;
+            color: #d4af37; 
+            font-family: 'Georgia', serif; 
+            margin: 0; 
+            display: flex; 
+            min-height: 100vh; 
+        }
+        
+        .main-container { display: flex; width: 100%; flex-direction: row; }
+        
+        .main-content { 
+            width: 70%; 
+            padding: 20px; 
+            overflow-y: auto; 
+            background-color: rgba(10, 10, 10, 0.6); 
+        }
+        
+        .header-title { 
+            text-align: center; 
+            color: #b22222; 
+            font-size: 2.4em; 
+            letter-spacing: 2px; 
+            text-shadow: 2px 2px 5px #000;
+        }
+        
+        .visual-display { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        
+        .visual-display img { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border: 2px solid #8b0000; 
+            border-radius: 8px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
+
+        .westeros-map-panel {
+            background: linear-gradient(145deg, #180303, #0d0d0d);
+            border: 2px solid #8b0000;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: inset 0 0 20px #000;
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .region-card {
+            background-color: rgba(20, 20, 20, 0.8);
+            border: 1px solid #d4af37;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            text-align: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+        }
+
+        .region-card b { color: #ff6b6b; display: block; margin-bottom: 4px; }
+        
+        .raven-system, .spy-system, .war-system, .bank-system { 
+            background: linear-gradient(145deg, #1f0505, #111);
+            border: 1px solid #8b0000; 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; 
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 15px #000, 0 5px 15px rgba(139,0,0,0.2);
+        }
+        
+        .raven-system select, .raven-system button, .raven-system textarea, 
+        .spy-system textarea, .spy-system button, 
+        .war-system input, .war-system select, .war-system button, 
+        .bank-system input, .bank-system select, .bank-system button,
+        .auth-panel input, .auth-panel select { 
+            padding: 10px; 
+            font-size: 15px; 
+            margin: 8px 0; 
+            background-color: #050505; 
+            color: #d4af37; 
+            border: 1px solid #d4af37; 
+            cursor: pointer; 
+            font-family: 'Georgia', serif; 
+            border-radius: 4px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .raven-system button, .spy-system button, .war-system button, .bank-system button { width: auto; font-weight: bold; padding: 10px 20px; }
+        .raven-system button:hover, .spy-system button:hover, .war-system button:hover, .bank-system button:hover { background-color: #8b0000; color: white; border-color: #8b0000; box-shadow: 0 0 10px #8b0000; }
+        
+        .sidebar { 
+            width: 30%; 
+            background-color: rgba(15, 15, 15, 0.85); 
+            border-left: 2px solid #8b0000; 
+            padding: 20px; 
+            overflow-y: auto; 
+            box-shadow: -5px 0 20px rgba(0,0,0,0.7);
+        }
+        
+        .sidebar h3 { text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.2em; text-shadow: 1px 1px 3px #000; }
+        
+        .player-list { list-style: none; padding: 0; }
+        
+        .player-list li { 
+            display: flex; 
+            align-items: center; 
+            background: linear-gradient(90deg, #1f0505, #1a1a1a);
+            padding: 8px; 
+            margin-bottom: 8px; 
+            border-radius: 5px; 
+            border: 1px solid #333;
+        }
+        
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d4af37; margin-right: 12px; object-fit: cover; box-shadow: 0 0 8px #d4af37; flex-shrink: 0; }
+        
+        .online-dot { width: 10px; height: 10px; background-color: #00ff00; border-radius: 50%; margin-left: auto; box-shadow: 0 0 8px #00ff00; flex-shrink: 0; }
+        
+        .auth-panel { 
+            background: linear-gradient(145deg, #2a0808, #111);
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            text-align: center; 
+            border: 1px solid #8b0000; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .auth-btn { width: 48%; padding: 8px; margin: 5px 1%; border: none; cursor: pointer; border-radius: 4px; font-family: 'Georgia', serif; font-weight: bold; transition: 0.3s; display: inline-block; }
+        .btn-login { background-color: #333; color: white; border: 1px solid #555; }
+        .btn-register { background-color: #8b0000; color: white; border: 1px solid #ff4c4c; }
+        .btn-logout { background-color: #4a0000; color: #ff6b6b; border: 1px solid #ff6b6b; width: 100%; margin-top: 10px; }
+
+        .feed-global, .history-box {
+            background-color: rgba(20, 5, 5, 0.9);
+            border: 1px dashed #d4af37;
+            padding: 12px;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .cuervo-activo-card {
+            background: rgba(40, 10, 10, 0.95);
+            border: 1px solid #ff4c4c;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .main-content, .sidebar { width: 100%; box-sizing: border-box; }
+            .sidebar { border-left: none; border-top: 2px solid #8b0000; }
+            .visual-display img { height: 160px; }
+            .map-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="main-content">
+        <h1 class="header-title">El consejo negro</h1>
+        
+        <div class="visual-display">
+            <img src="banderas.jpeg" alt="Banderas Facciones">
+            <img src="estandartes.jpeg" alt="Estandartes de las Casas">
+            <img src="tapiz.jpeg" alt="Tapiz de Poniente" style="grid-column: span 2; height: 130px;"> 
+        </div>
+
+        <div class="westeros-map-panel">
+            <h2 style="color: #b22222; margin-top: 0; font-size: 1.5em;">🗺️ Mapa Táctico de los Siete Reinos</h2>
+            <div class="map-grid">
+                <div class="region-card"><b>Rocadragón</b>Fuerte del Consejo Negro</div>
+                <div class="region-card"><b>Desembarco del Rey</b>Bastión de los Verdes</div>
+                <div class="region-card"><b>Marcaderiva</b>Flota de los Velaryon</div>
+                <div class="region-card"><b>Harrenhal</b>Bastión de Daemon</div>
+                <div class="region-card"><b>El Valle</b>Lealtad en Juego</div>
+                <div class="region-card"><b>Bastión de Tormentas</b>Territorio Baratheon</div>
+            </div>
+        </div>
+
+        <!-- Banco de Hierro -->
+        <div class="bank-system" id="panelBancoHierro" style="display:none;">
+            <h2 style="color: #c0c0c0; font-size: 1.4em;">🏛️ Banco de Hierro de Braavos</h2>
+            <select id="faccionPrestamo">
+                <option value="Los Negros">Los Negros (Targaryen/Velaryon)</option>
+                <option value="Los Verdes">Los Verdes (Targaryen/Hightower)</option>
+            </select>
+            <input type="number" id="montoPrestamo" value="5000" step="500">
+            <button id="btnOtorgarPrestamo" style="background: #333; color: #c0c0c0; border: 1px solid #c0c0c0;">💰 Otorgar Préstamo Oficial</button>
+        </div>
+
+        <!-- Cuartel de Guerra -->
+        <div class="war-system" id="panelGuerra" style="display:none;">
+            <h2 style="color: #b22222; font-size: 1.4em;">⚔️ Cuartel de Guerra y Tesorería</h2>
+            <p id="infoTesoroCasa" style="font-size: 0.9em; color: #ffd43b; margin-top: 0; font-weight: bold;"></p>
+            <div id="avisoNoLider" style="color: #ff6b6b; font-size: 0.9em; margin-bottom: 10px; display:none;">
+                ⚠️ Solo la Cabeza de Casa puede declarar marchas militares.
+            </div>
+            <div id="comandanteControles">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left;">
+                    <div>
+                        <label style="font-size: 0.8em; color: #d4af37;">Caballeros:</label>
+                        <input type="number" id="tropasCaballeros" value="500">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8em; color: #d4af37;">Infantería:</label>
+                        <input type="number" id="tropasInfanteria" value="4000">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8em; color: #d4af37;">Arqueros:</label>
+                        <input type="number" id="tropasArqueros" value="1500">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8em; color: #d4af37;">Destino:</label>
+                        <select id="destinoMarcha">
+                            <option value="Desembarco del Rey">Desembarco del Rey</option>
+                            <option value="Rocadragón">Rocadragón</option>
+                            <option value="Marcaderiva">Marcaderiva</option>
+                            <option value="Harrenhal">Harrenhal</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="btnMarcha" style="margin-top: 10px;">📢 Declarar Marcha Oficial</button>
+            </div>
+        </div>
+
+        <!-- Cuervos Tácticos -->
+        <div class="raven-system" id="panelCuervo" style="display:none;">
+            <h2>Enviar cuervo mensajero</h2>
+            <select id="regionOrigen">
+                <option value="Rocadragón">Desde: Rocadragón</option>
+                <option value="Marcaderiva">Desde: Marcaderiva</option>
+                <option value="Harrenhal">Desde: Harrenhal</option>
+                <option value="Desembarco del Rey">Desembarco del Rey</option>
+            </select>
+            <select id="rutaCuervo">
+                <option value="300|0.1">Ruta Segura (5 min | 10% riesgo)</option>
+                <option value="180|0.5">Ruta Rápida (3 min | 50% riesgo)</option>
+                <option value="30|0.8">Territorio Enemigo (30 seg | 80% riesgo)</option>
+            </select>
+            <select id="destinatarioCuervoSelect">
+                <option value="Reino">Al Reino (Público)</option>
+            </select>
+            <textarea id="textoCuervo" rows="2" placeholder="Escribe el mensaje estratégico..."></textarea>
+            <button id="btnCuervo">Liberar cuervo táctico</button>
+        </div>
+
+        <!-- Red de Espías -->
+        <div class="spy-system" id="panelEspias" style="display:none;">
+            <h2 style="color: #b22222; font-size: 1.4em;">🕷️ Murmullo de las Arañas (Rumores)</h2>
+            <textarea id="textoRumor" rows="2" placeholder="Escribe tu rumor anónimo..."></textarea>
+            <button id="btnEnviarRumor">Susurrar rumor</button>
+        </div>
+
+        <!-- Historial Personal -->
+        <div class="raven-system" id="panelHistorial" style="display:none;">
+            <h3 style="color: #d4af37; margin-top: 0;">📜 Tu Buró de Pergaminos</h3>
+            <div class="history-box" id="listaHistorialPersonal">
+                <p style="color: #777; text-align: center;">No hay pergaminos secretos...</p>
+            </div>
+        </div>
+
+        <!-- Vuelo de Cuervos -->
+        <div class="raven-system">
+            <h3>Cielo de Poniente (Vuelos y Sabotajes activos)</h3>
+            <div class="feed-global" id="feedEventos">
+                <p style="color: #777; text-align: center;">No hay cuervos surcando el cielo...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="auth-panel" id="panelAuth"></div>
+        <h3>Usuarios conectados</h3>
+        <ul class="player-list" id="listaUsuariosActivos"></ul>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, updateDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAK2zidlUykm3J86-e_AM5JCswvFznyE-A",
+        authDomain: "consejo-4d810.firebaseapp.com",
+        projectId: "consejo-4d810",
+        storageBucket: "consejo-4d810.firebasestorage.app",
+        messagingSenderId: "1062967101002",
+        appId: "1:1062967101002:web:03940dc1f4ff3abf0c88b3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let usuarioActual = null;
+    let datosPerfilActual = null;
+
+    // Pedir permiso para Notificaciones del Navegador al entrar
+    if ("Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    function dispararNotificacion(titulo, cuerpo) {
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification(titulo, { body: cuerpo, icon: "broche.jpeg" });
+        }
+    }
+
+    const listaDragonesOficiales = [
+        "Syrax", "Caraxes", "Meleys", "Vermax", "Arrax", "Tyraxes", "Stormcloud", "Moondancer", 
+        "Seasmoke", "Vermithor", "Silverwing", "Morning", "Sunfyre", "Vhagar", "Dreamfyre", "Tessarion",
+        "El Caníbal", "Robaojas (Sheepstealer)", "Fantasmas Gris (Grey Ghost)"
+    ];
+
+    window.actualizarSelectDragones = async function(selectElementId) {
+        let select = document.getElementById(selectElementId);
+        if(!select) return;
+        select.innerHTML = '<option value="ninguno">Sin Dragón</option>';
+
+        let querySnapshot = await getDocs(collection(db, "perfilesRol"));
+        let dragonesOcupados = [];
+        querySnapshot.forEach((d) => {
+            let data = d.data();
+            if(data.tieneDragon === "si" && data.nombreDragon) {
+                dragonesOcupados.push(data.nombreDragon);
+            }
+        });
+
+        listaDragonesOficiales.forEach(dragon => {
+            let option = document.createElement("option");
+            option.value = dragon;
+            if(dragonesOcupados.includes(dragon)) {
+                option.innerText = `❌ ${dragon} (Ya reclamado)`;
+                option.disabled = true;
+            } else {
+                option.innerText = `🔥 ${dragon} (Disponible)`;
+            }
+            select.appendChild(option);
+        });
+    }
+
+    window.subirImagenGaleria = async function(inputElement, callback) {
+        let file = inputElement.files[0];
+        if (!file) return callback(null);
+
+        let formData = new FormData();
+        formData.append("image", file);
+        let apiKey = "6d207e02198a847aa98d0a2a901485a5"; 
+        
+        try {
+            alert("Subiendo imagen a la nube...");
+            let response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                method: "POST",
+                body: formData
+            });
+            let result = await response.json();
+            if(result.success) {
+                callback(result.data.url);
+            } else {
+                alert("Error al subir imagen.");
+                callback(null);
+            }
+        } catch (e) {
+            console.error("Error API:", e);
+            alert("Fallo de red.");
+            callback(null);
+        }
+    }
+
+    document.getElementById("btnOtorgarPrestamo")?.addEventListener("click", async () => {
+        let faccion = document.getElementById("faccionPrestamo").value;
+        let monto = document.getElementById("montoPrestamo").value;
+        try {
+            let textoNoti = `🏛️ [BANCO DE HIERRO]: Préstamo masivo de ${monto} Dragones de Oro concedido a [${faccion}].`;
+            await addDoc(collection(db, "eventos"), {
+                texto: textoNoti + ` "El Banco siempre cobra"`,
+                tipo: "exito",
+                timestamp: serverTimestamp()
+            });
+            dispararNotificacion("¡Crédito Otorgado por el Banco de Hierro!", textoNoti);
+            alert("¡Préstamo otorgado!");
+        } catch(e) { console.error("Error banco:", e); }
+    });
+
+    document.getElementById("btnMarcha")?.addEventListener("click", async () => {
+        if (!usuarioActual || !datosPerfilActual) return;
+        if (datosPerfilActual.rango !== "Líder (Cabeza de Casa)") {
+            alert("Solo la Cabeza de Casa puede declarar marchas.");
+            return;
+        }
+
+        let caballeros = parseInt(document.getElementById("tropasCaballeros").value);
+        let infanteria = parseInt(document.getElementById("tropasInfanteria").value);
+        let arqueros = parseInt(document.getElementById("tropasArqueros").value);
+        let destino = document.getElementById("destinoMarcha").value;
+        let comandante = datosPerfilActual.nombre;
+        let casa = datosPerfilActual.casa;
+
+        let infoDragon = datosPerfilActual.tieneDragon === "si" ? ` ¡Marcha con su dragón [${datosPerfilActual.nombreDragon}] 🔥!` : "";
+        let textoNoti = `⚔️ ¡MARCHA MILITAR DE ${casa.toUpperCase()}! ${comandante} avanza hacia [${destino}].`;
+
+        try {
+            await addDoc(collection(db, "eventos"), {
+                texto: textoNoti + infoDragon,
+                tipo: "peligro",
+                timestamp: serverTimestamp()
+            });
+            dispararNotificacion("¡Alerta de Guerra en Poniente!", textoNoti);
+            alert("¡Marcha declarada!");
+        } catch (e) { console.error("Error marcha:", e); }
+    });
+
+    document.getElementById("btnCuervo").addEventListener("click", async () => {
+        if (!usuarioActual) return;
+        let origen = document.getElementById("regionOrigen").value;
+        let datosRuta = document.getElementById("rutaCuervo").value.split('|');
+        let tiempoSegundos = parseInt(datosRuta[0]);
+        let riesgo = parseFloat(datosRuta[1]);
+        
+        let destinatario = document.getElementById("destinatarioCuervoSelect").value;
+        let mensaje = document.getElementById("textoCuervo").value.trim();
+        let remitente = datosPerfilActual ? datosPerfilActual.nombre : usuarioActual.displayName;
+
+        if (mensaje === "") return alert("El cuervo necesita un mensaje.");
+
+        let tiempoTermino = Date.now() + (tiempoSegundos * 1000);
+
+        try {
+            await addDoc(collection(db, "cuervosVuelo"), {
+                remitente: remitente,
+                origen: origen,
+                destinatario: destinatario,
+                mensaje: mensaje,
+                riesgo: riesgo,
+                tiempoTermino: tiempoTermino,
+                estado: "en_vuelo"
+            });
+
+            await addDoc(collection(db, "eventos"), {
+                texto: `🕊️ ${remitente} soltó un cuervo desde [${origen}] hacia [${destinatario}].`,
+                tipo: "info",
+                timestamp: serverTimestamp()
+            });
+
+            dispararNotificacion("Cuervo en Vuelo", `${remitente} ha lanzado un cuervo desde ${origen}.`);
+            document.getElementById("textoCuervo").value = "";
+        } catch (e) { console.error("Error cuervo:", e); }
+    });
+
+    document.getElementById("btnEnviarRumor").addEventListener("click", async () => {
+        let rumor = document.getElementById("textoRumor").value.trim();
+        if (rumor === "") return alert("El rumor está vacío.");
+
+        try {
+            await addDoc(collection(db, "eventos"), {
+                texto: `🕷️ [Murmullo Anónimo]: "${rumor}"`,
+                tipo: "rumor",
+                timestamp: serverTimestamp()
+            });
+            document.getElementById("textoRumor").value = "";
+        } catch (e) { console.error("Error rumor:", e); }
+    });
+
+    window.intentarDerribar = async function(cuervoId, riesgo, remitente, destinatario, origen) {
+        if (!usuarioActual || !datosPerfilActual) return;
+        let cazador = datosPerfilActual.nombre;
+        if (cazador === remitente) return alert("¡No puedes derribar tu propio cuervo!");
+
+        let exitoSabotaje = Math.random() < riesgo;
+        try {
+            if (exitoSabotaje) {
+                await updateDoc(doc(db, "cuervosVuelo", cuervoId), { estado: "derribado" });
+                let textoNoti = `🩸 ¡SABOTAJE! ${cazador} derribó el cuervo de ${remitente} desde [${origen}].`;
+                await addDoc(collection(db, "eventos"), {
+                    texto: textoNoti,
+                    tipo: "peligro",
+                    timestamp: serverTimestamp()
+                });
+                dispararNotificacion("¡Cuervo Interceptado!", textoNoti);
+            } else {
+                await addDoc(collection(db, "eventos"), {
+                    texto: `🛡️ ${cazador} intentó cazar el cuervo de ${remitente}, ¡pero escapó!`,
+                    tipo: "exito",
+                    timestamp: serverTimestamp()
+                });
+            }
+        } catch (e) { console.error("Error sabotaje:", e); }
+    };
+
+    async function cargarDatosPerfil(user) {
+        let docRef = doc(db, "perfilesRol", user.uid);
+        let docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            datosPerfilActual = docSnap.data();
+        }
+    }
+
+    function renderizarPanelAuth(user, perfil) {
+        const panelAuth = document.getElementById("panelAuth");
+        const panelCuervo = document.getElementById("panelCuervo");
+        const panelEspias = document.getElementById("panelEspias");
+        const panelHistorial = document.getElementById("panelHistorial");
+        const panelGuerra = document.getElementById("panelGuerra");
+        const panelBancoHierro = document.getElementById("panelBancoHierro");
+
+        if (user) {
+            panelCuervo.style.display = "block";
+            panelEspias.style.display = "block";
+            panelHistorial.style.display = "block";
+            panelGuerra.style.display = "block";
+
+            let nombre = perfil ? perfil.nombre : (user.displayName || "Personaje");
+            let foto = user.photoURL || "broche.jpeg";
+            let casa = perfil ? perfil.casa : "Independiente";
+            let rango = perfil ? perfil.rango : "Miembro";
+            let parentesco = perfil && perfil.parentesco ? `(${perfil.parentesco})` : "";
+            let dragonInfo = perfil && perfil.tieneDragon === "si" ? `🐉 Dragón: ${perfil.nombreDragon}` : "Sin dragón";
+            let tesoro = perfil && perfil.oro ? `${perfil.oro} Dragones de Oro` : "25,000 Dragones de Oro";
+
+            let esBancoDeHierro = nombre.toLowerCase().includes("banco de hierro") || (perfil && perfil.esBanco);
+            if (esBancoDeHierro) {
+                panelBancoHierro.style.display = "block";
+                tesoro = "♾️ Fortuna Infinita (Braavos)";
+            } else {
+                panelBancoHierro.style.display = "none";
+            }
+
+            document.getElementById("infoTesoroCasa").innerText = `💰 Tesorería de la Casa: ${tesoro}`;
+
+            if (rango === "Líder (Cabeza de Casa)") {
+                document.getElementById("avisoNoLider").style.display = "none";
+                document.getElementById("comandanteControles").style.display = "block";
+            } else {
+                document.getElementById("avisoNoLider").style.display = "block";
+                document.getElementById("comandanteControles").style.display = "none";
+            }
+
+            panelAuth.innerHTML = `
+                <h3 style="color: #d4af37; border: none; margin-top: 0;">Tu Personaje</h3>
+                <img src="${foto}" class="avatar" style="width: 70px; height: 70px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;" onerror="this.src='broche.jpeg'">
+                <p style="margin: 5px 0; font-weight: bold; font-size: 1.1em;">${nombre}</p>
+                <p style="margin: 3px 0; font-size: 0.85em; color: #ff6b6b;">🏠 ${casa} <br><b>${rango}</b> ${parentesco}</p>
+                <p style="margin: 3px 0; font-size: 0.85em; color: #63e6be;">${dragonInfo}</p>
+                
+                <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; text-align: left;">
+                    <label style="font-size: 0.8em; color: #aaa;">Corregir nombre:</label>
+                    <input type="text" id="cambiarNombreInput" value="${nombre}">
+                    <button class="auth-btn btn-login" id="btnActualizarNombre" style="width: 100%; margin-top: 3px;">Guardar Nombre</button>
+
+                    <label style="font-size: 0.8em; color: #aaa; margin-top: 8px; display:block;">Subir foto desde galería:</label>
+                    <input type="file" id="inputFotoGaleria" accept="image/*" style="font-size:0.8em; color:#d4af37; margin:5px 0;">
+                    <button class="auth-btn btn-login" id="btnSubirFoto" style="width: 100%; margin-top: 3px;">Subir y Guardar Foto</button>
+                </div>
+
+                <button class="auth-btn btn-logout" id="btnLogout" style="margin-top: 12px;">Cerrar sesión</button>
+            `;
+
+            document.getElementById("btnActualizarNombre").addEventListener("click", async () => {
+                let nuevoNombre = document.getElementById("cambiarNombreInput").value.trim();
+                if (nuevoNombre === "") return alert("El nombre no puede estar vacío.");
+                try {
+                    await updateProfile(auth.currentUser, { displayName: nuevoNombre });
+                    await updateDoc(doc(db, "perfilesRol", user.uid), { nombre: nuevoNombre });
+                    alert("¡Nombre actualizado!");
+                    location.reload();
+                } catch(e) { alert("Error: " + e.message); }
+            });
+
+            document.getElementById("btnSubirFoto").addEventListener("click", () => {
+                let inputGaleria = document.getElementById("inputFotoGaleria");
+                subirImagenGaleria(inputGaleria, async (urlRemota) => {
+                    if(!urlRemota) return;
+                    try {
+                        await updateProfile(auth.currentUser, { photoURL: urlRemota });
+                        await updateDoc(doc(db, "perfilesRol", user.uid), { foto: urlRemota });
+                        alert("¡Foto actualizada!");
+                        location.reload();
+                    } catch(e) { alert("Error: " + e.message); }
+                });
+            });
+
+            document.getElementById("btnLogout").addEventListener("click", async () => {
+                try {
+                    await deleteDoc(doc(db, "usuariosActivos", user.uid));
+                    await signOut(auth);
+                } catch (e) { console.error("Error al salir:", e); }
+            });
+
+        } else {
+            panelCuervo.style.display = "none";
+            panelEspias.style.display = "none";
+            panelHistorial.style.display = "none";
+            panelGuerra.style.display = "none";
+            panelBancoHierro.style.display = "none";
+
+            panelAuth.innerHTML = `
+                <h3 style="color: #d4af37; border: none; margin-top: 0;">Registro / Acceso</h3>
+                <input type="text" id="usuarioInput" placeholder="Nombre de tu personaje">
+                <input type="password" id="passInput" placeholder="Contraseña (6+ caracteres)">
+                
+                <label style="font-size: 0.8em; color: #aaa; text-align: left; display: block; margin-top: 5px;">Casa / Facción:</label>
+                <select id="casaInput">
+                    <option value="Los Negros (Targaryen/Velaryon)">Los Negros (Targaryen / Velaryon)</option>
+                    <option value="Los Verdes (Targaryen/Hightower)">Los Verdes (Targaryen / Hightower)</option>
+                    <option value="Banco de Hierro de Braavos">🏛️ Banco de Hierro de Braavos</option>
+                    <option value="Independiente / Otro">Independiente / Otro</option>
+                </select>
+
+                <label style="font-size: 0.8em; color: #aaa; text-align: left; display: block; margin-top: 5px;">Rango Dinástico:</label>
+                <select id="rangoInput" onchange="document.getElementById('divParentesco').style.display = this.value.includes('Familiar') ? 'block' : 'none';">
+                    <option value="Líder (Cabeza de Casa)">Líder (Cabeza de Casa)</option>
+                    <option value="Heredero / Consorte">Heredero / Consorte</option>
+                    <option value="Familiar / Miembro de la Estirpe">Familiar / Miembro de la Estirpe</option>
+                </select>
+
+                <div id="divParentesco" style="display:none; text-align: left;">
+                    <label style="font-size: 0.8em; color: #aaa;">Parentesco (ej. Hijo/a, Bastardo/a):</label>
+                    <input type="text" id="parentescoInput" placeholder="Ej. Hijo/a legítimo/a, Bastardo/a...">
+                </div>
+
+                <label style="font-size: 0.8em; color: #aaa; text-align: left; display: block; margin-top: 5px;">¿Posee Dragón?</label>
+                <select id="tieneDragonInput" onchange="let val = this.value === 'si'; document.getElementById('divDragonSelect').style.display = val ? 'block' : 'none'; if(val) actualizarSelectDragones('selectDragonOficial');">
+                    <option value="no">No</option>
+                    <option value="si">Sí</option>
+                </select>
+
+                <div id="divDragonSelect" style="display:none; text-align: left;">
+                    <label style="font-size: 0.8em; color: #aaa;">Catálogo de Dragones Únicos:</label>
+                    <select id="selectDragonOficial"></select>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <button class="auth-btn btn-login" id="btnLogin">Entrar</button>
+                    <button class="auth-btn btn-register" id="btnRegister">Crear cuenta</button>
+                </div>
+            `;
+
+            document.getElementById("btnLogin").addEventListener("click", () => procesarAcceso('entrar'));
+            document.getElementById("btnRegister").addEventListener("click", () => procesarAcceso('registrar'));
+        }
+    }
+
+    async function procesarAcceso(accion) {
+        let nombre = document.getElementById("usuarioInput").value.trim();
+        let password = document.getElementById("passInput").value;
+
+        if (nombre === "" || password === "") return alert("Por favor, ingresa nombre y contraseña.");
+
+        let correoSecreto = nombre.replace(/\s+/g, '') + "@rol.com";
+        let fotoFinal = "broche.jpeg";
+
+        if (accion === 'registrar') {
+            let casa = document.getElementById("casaInput").value;
+            let rango = document.getElementById("rangoInput").value;
+            let parentesco = document.getElementById("parentescoInput") ? document.getElementById("parentescoInput").value.trim() : "";
+            let tieneDragon = document.getElementById("tieneDragonInput").value;
+            let nombreDragon = tieneDragon === "si" ? document.getElementById("selectDragonOficial").value : "";
+
+            let esBanco = nombre.toLowerCase().includes("banco de hierro") || casa.includes("Banco de Hierro");
+
+            try {
+                let userCred = await createUserWithEmailAndPassword(auth, correoSecreto, password);
+                await updateProfile(userCred.user, { displayName: nombre, photoURL: fotoFinal });
+                
+                await setDoc(doc(db, "perfilesRol", userCred.user.uid), {
+                    nombre: nombre,
+                    casa: casa,
+                    rango: rango,
+                    parentesco: parentesco,
+                    tieneDragon: tieneDragon,
+                    nombreDragon: nombreDragon,
+                    oro: esBanco ? 9999999 : 25000,
+                    esBanco: esBanco,
+                    foto: fotoFinal
+                });
+
+                alert("¡Cuenta creada con éxito, " + nombre + "!");
+                await signInWithEmailAndPassword(auth, correoSecreto, password);
+            } catch (error) { alert("Error: " + error.message); }
+        } else {
+            try {
+                await signInWithEmailAndPassword(auth, correoSecreto, password);
+            } catch (error) { alert("Error al entrar: " + error.message); }
+        }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        usuarioActual = user;
+        if (user) {
+            await cargarDatosPerfil(user);
+            renderizarPanelAuth(user, datosPerfilActual);
+
+            let fotoUser = user.photoURL || "broche.jpeg";
+            let nombreLimpio = datosPerfilActual ? datosPerfilActual.nombre : (user.displayName || "RolPlayer");
+            let casaUser = datosPerfilActual ? datosPerfilActual.casa : "Casa";
+
+            await setDoc(doc(db, "usuariosActivos", user.uid), {
+                nombre: `${nombreLimpio} (${casaUser})`,
+                avatar: fotoUser,
+                lastSeen: serverTimestamp()
+            });
+        } else {
+            datosPerfilActual = null;
+            renderizarPanelAuth(null, null);
+            document.getElementById("listaUsuariosActivos").innerHTML = '';
+        }
+    });
+
+    onSnapshot(collection(db, "usuariosActivos"), (snapshot) => {
+        let contenedorLista = document.getElementById("listaUsuariosActivos");
+        let selectDestinatario = document.getElementById("destinatarioCuervoSelect");
+        
+        contenedorLista.innerHTML = '';
+        selectDestinatario.innerHTML = '<option value="Reino">Al Reino (Público)</option>';
+
+        snapshot.forEach((docSnap) => {
+            let data = docSnap.data();
+            let nuevoUsuario = document.createElement("li");
+            let avatarSrc = data.avatar ? data.avatar : "broche.jpeg";
+            let nombreLimpioParaSelect = data.nombre.split(' (')[0];
+
+            nuevoUsuario.innerHTML = `
+                <img src="${avatarSrc}" class="avatar" onerror="this.src='broche.jpeg'">
+                <span>${data.nombre}</span>
+                <div class="online-dot"></div>
+            `;
+            contenedorLista.appendChild(nuevoUsuario);
+
+            if (usuarioActual && datosPerfilActual && nombreLimpioParaSelect !== datosPerfilActual.nombre) {
+                let option = document.createElement("option");
+                option.value = nombreLimpioParaSelect;
+                option.innerText = data.nombre;
+                selectDestinatario.appendChild(option);
+            }
+        });
+    });
+
+    onSnapshot(collection(db, "cuervosVuelo"), (snapshot) => {
+        snapshot.forEach(async (docSnap) => {
+            let cuervo = docSnap.data();
+            let id = docSnap.id;
+            let ahora = Date.now();
+            let tiempoRestante = Math.ceil((cuervo.tiempoTermino - ahora) / 1000);
+
+            if (cuervo.estado === "en_vuelo" && tiempoRestante <= 0) {
+                let esPrivado = cuervo.destinatario !== "Reino";
+                let miNombre = datosPerfilActual ? datosPerfilActual.nombre : "";
+                
+                let textoEntrega = "";
+                if (esPrivado) {
+                    textoEntrega = `📜 [Pergamino Privado] De ${cuervo.remitente} para ${cuervo.destinatario}: "${cuervo.mensaje}"`;
+                    if (miNombre === cuervo.destinatario || miNombre === cuervo.remitente) {
+                        try {
+                            await addDoc(collection(db, "historialPrivado"), {
+                                propietario: miNombre,
+                                texto: `De [${cuervo.remitente}] vía [${cuervo.origen}]: "${cuervo.mensaje}"`,
+                                timestamp: serverTimestamp()
+                            });
+                            dispararNotificacion("¡Nuevo Pergamino Secreto!", `Has recibido un cuervo privado de ${cuervo.remitente}.`);
+                        } catch(err) { console.error("Error historial:", err); }
+                    }
+                } else {
+                    textoEntrega = `📜 [Decreto Público de ${cuervo.remitente} desde ${cuervo.origen}]: "${cuervo.mensaje}"`;
+                }
+
+                try {
+                    await addDoc(collection(db, "eventos"), {
+                        texto: textoEntrega,
+                        tipo: "exito",
+                        timestamp: serverTimestamp()
+                    });
+                    await deleteDoc(doc(db, "cuervosVuelo", id));
+                } catch(e) { console.error("Error vuelo:", e); }
+            }
+        });
+    });
+
+    onSnapshot(collection(db, "historialPrivado"), (snapshot) => {
+        if (!usuarioActual || !datosPerfilActual) return;
+        let miNombre = datosPerfilActual.nombre;
+        let cajaHistorial = document.getElementById("listaHistorialPersonal");
+        cajaHistorial.innerHTML = '';
+
+        let encontrados = 0;
+        snapshot.forEach((docSnap) => {
+            let item = docSnap.data();
+            if (item.propietario === miNombre) {
+                encontrados++;
+                let p = document.createElement("p");
+                p.style.margin = "6px 0";
+                p.style.color = "#ffd43b";
+                p.innerText = item.texto;
+                cajaHistorial.appendChild(p);
+            }
+        });
+
+        if (encontrados === 0) {
+            cajaHistorial.innerHTML = '<p style="color: #777; text-align: center;">No hay pergaminos secretos en tu bandeja...</p>';
+        }
+    });
+
+    const qEventos = query(collection(db, "eventos"), orderBy("timestamp", "desc"));
+    onSnapshot(qEventos, (snapshotEventos) => {
+        onSnapshot(collection(db, "cuervosVuelo"), (snapshotCuervos) => {
+            let feed = document.getElementById("feedEventos");
+            feed.innerHTML = '';
+
+            snapshotCuervos.forEach((docSnap) => {
+                let c = docSnap.data();
+                let id = docSnap.id;
+                let segundosRestantes = Math.ceil((c.tiempoTermino - Date.now()) / 1000);
+
+                if (c.estado === "en_vuelo" && segundosRestantes > 0) {
+                    let divCuervo = document.createElement("div");
+                    divCuervo.className = "cuervo-activo-card";
+                    divCuervo.innerHTML = `
+                        <p style="margin: 0 0 5px 0; color: #ffb7b7; font-weight: bold;">
+                            🕊️ Desde [<b>${c.origen}</b>] de <b>${c.remitente}</b> ➔ <b>[${c.destinatario}]</b>
+                        </p>
+                        <p style="margin: 0 0 8px 0; font-size: 0.85em; color: #ffd43b;">
+                            ⏱️ Vuelo: <b>${segundosRestantes}s</b> | Riesgo: ${c.riesgo * 100}%
+                        </p>
+                        <button onclick="intentarDerribar('${id}', ${c.riesgo}, '${c.remitente}', '${c.destinatario}', '${c.origen}')" 
+                            style="background: #8b0000; color: white; border: 1px solid #ff4c4c; padding: 5px 10px; cursor: pointer; font-size: 0.85em; border-radius: 4px;">
+                            🎯 ¡Intentar derribar cuervo!
+                        </button>
+                    `;
+                    feed.appendChild(divCuervo);
+                }
+            });
+
+            snapshotEventos.forEach((docSnap) => {
+                let evento = docSnap.data();
+                let p = document.createElement("p");
+                p.style.margin = "6px 0";
+                
+                if (evento.tipo === "peligro") {
+                    p.style.color = "#ff6b6b";
+                } else if (evento.tipo === "exito") {
+                    p.style.color = "#51cf66";
+                } else if (evento.tipo === "rumor") {
+                    p.style.color = "#da77f2";
+                } else {
+                    p.style.color = "#ffd43b";
+                }
+
+                p.innerText = evento.texto;
+                feed.appendChild(p);
+            });
+        });
+    });
+</script>
+</body>
+</html>
