@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consejo Negro RPG - La Casa del Dragón</title>
+    <style>
+        body { 
+            background: radial-gradient(circle at top center, #3a0808 0%, #050505 100%);
+            background-attachment: fixed;
+            color: #d4af37; 
+            font-family: 'Georgia', serif; 
+            margin: 0; 
+            display: flex; 
+            height: 100vh; 
+        }
+        
+        .main-container { display: flex; width: 100%; }
+        
+        .main-content { 
+            width: 70%; 
+            padding: 30px; 
+            overflow-y: auto; 
+            background-color: rgba(10, 10, 10, 0.6); 
+        }
+        
+        .header-title { 
+            text-align: center; 
+            color: #b22222; 
+            font-size: 2.8em; 
+            letter-spacing: 2px; 
+            text-shadow: 2px 2px 5px #000;
+        }
+        
+        .visual-display { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        
+        .visual-display img { 
+            width: 100%; 
+            height: 250px; 
+            object-fit: cover; 
+            border: 2px solid #8b0000; 
+            border-radius: 8px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
+        
+        .raven-system { 
+            background: linear-gradient(145deg, #1f0505, #111);
+            border: 1px solid #8b0000; 
+            padding: 20px; 
+            border-radius: 8px; 
+            text-align: center; 
+            box-shadow: inset 0 0 15px #000, 0 5px 15px rgba(139,0,0,0.2);
+        }
+        
+        .raven-system select, .raven-system button { 
+            padding: 10px; 
+            font-size: 16px; 
+            margin: 10px; 
+            background-color: #050505; 
+            color: #d4af37; 
+            border: 1px solid #d4af37; 
+            cursor: pointer; 
+            font-family: 'Georgia', serif; 
+            border-radius: 4px; 
+            transition: all 0.3s;
+        }
+        
+        .raven-system button:hover { background-color: #8b0000; color: white; border-color: #8b0000; box-shadow: 0 0 10px #8b0000; }
+        
+        .sidebar { 
+            width: 30%; 
+            background-color: rgba(15, 15, 15, 0.85); 
+            border-left: 2px solid #8b0000; 
+            padding: 20px; 
+            overflow-y: auto; 
+            box-shadow: -5px 0 20px rgba(0,0,0,0.7);
+        }
+        
+        .sidebar h3 { text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.2em; text-shadow: 1px 1px 3px #000; }
+        
+        .player-list { list-style: none; padding: 0; }
+        
+        .player-list li { 
+            display: flex; 
+            align-items: center; 
+            background: linear-gradient(90deg, #1f0505, #1a1a1a);
+            padding: 10px; 
+            margin-bottom: 10px; 
+            border-radius: 5px; 
+            border: 1px solid #333;
+        }
+        
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #d4af37; margin-right: 15px; object-fit: cover; box-shadow: 0 0 8px #d4af37; }
+        
+        .online-dot { width: 10px; height: 10px; background-color: #00ff00; border-radius: 50%; margin-left: auto; box-shadow: 0 0 8px #00ff00; }
+        
+        .auth-panel { 
+            background: linear-gradient(145deg, #2a0808, #111);
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-top: 30px; 
+            text-align: center; 
+            border: 1px solid #8b0000; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .auth-panel input { width: 90%; margin-bottom: 10px; padding: 8px; border-radius: 4px; border: 1px solid #555; background-color: #0a0a0a; color: #d4af37; }
+        
+        .auth-btn { width: 45%; padding: 8px; margin: 5px 2%; border: none; cursor: pointer; border-radius: 4px; font-family: 'Georgia', serif; font-weight: bold; transition: 0.3s; }
+        
+        .btn-login { background-color: #333; color: white; border: 1px solid #555; }
+        .btn-login:hover { background-color: #555; }
+        
+        .btn-register { background-color: #8b0000; color: white; border: 1px solid #ff4c4c; }
+        .btn-register:hover { background-color: #a00000; box-shadow: 0 0 10px #ff4c4c; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="main-content">
+        <h1 class="header-title">El consejo negro</h1>
+        
+        <div class="visual-display">
+            <img src="banderas.jpeg" alt="Banderas Facciones">
+            <img src="estandartes.jpeg" alt="Estandartes de las Casas">
+            <img src="tapiz.jpeg" alt="Tapiz de Poniente" style="grid-column: span 2; height: 150px;"> 
+        </div>
+
+        <div class="raven-system">
+            <h2>Enviar cuervo mensajero</h2>
+            <select id="rutaCuervo">
+                <option value="0.1">Ruta segura (10% riesgo)</option>
+                <option value="0.5">Ruta rápida (50% riesgo)</option>
+                <option value="0.8">Sobrevolar territorio enemigo (80% riesgo)</option>
+            </select>
+            <button onclick="lanzarCuervo()">Liberar cuervo</button>
+            <h3 id="resultadoCuervo" style="margin-top: 20px; height: 30px;"></h3>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="auth-panel" id="panelAuth">
+            <h3 style="color: #d4af37; border: none; margin-top: 0;">Acceso a la sala</h3>
+            <input type="text" id="usuarioInput" placeholder="Nombre de tu personaje">
+            <input type="password" id="passInput" placeholder="Contraseña">
+            <p style="font-size: 0.8em; color: #aaa; margin-top: 0; margin-bottom: 15px; text-align: left;">
+                * Favor de poner una contraseña exclusiva solo para esto.
+            </p>
+            <div>
+                <button class="auth-btn btn-login" onclick="prepararAcceso('entrar')">Entrar</button>
+                <button class="auth-btn btn-register" onclick="prepararAcceso('registrar')">Crear cuenta</button>
+            </div>
+        </div>
+
+        <h3>Usuarios conectados</h3>
+        <ul class="player-list" id="listaUsuariosActivos">
+        </ul>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    // Configuración exacta de tu Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyAK2zidLUykm3J86-e_AM5JCswvFznyE-A",
+        authDomain: "consejo-4d810.firebaseapp.com",
+        projectId: "consejo-4d810",
+        storageBucket: "consejo-4d810.firebasestorage.app",
+        messagingSenderId: "1062967101002",
+        appId: "1:1062967101002:web:03940dc1f4ff3abf0c88b3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.lanzarCuervo = function() {
+        let selector = document.getElementById("rutaCuervo");
+        let probabilidadDerribo = parseFloat(selector.value);
+        let textoResultado = document.getElementById("resultadoCuervo");
+        textoResultado.innerText = "El cuervo alzó el vuelo... esperando noticias...";
+        textoResultado.style.color = "#d4af37";
+        
+        setTimeout(() => {
+            if (Math.random() < probabilidadDerribo) {
+                textoResultado.innerText = "🩸 ¡Desastre! El cuervo fue interceptado.";
+                textoResultado.style.color = "#ff4c4c";
+            } else {
+                textoResultado.innerText = "📜 El mensaje llegó a salvo a su destino.";
+                textoResultado.style.color = "#00ff00";
+            }
+        }, 2500); 
+    };
+
+    window.prepararAcceso = function(accion) {
+        let nombre = document.getElementById("usuarioInput").value;
+        let password = document.getElementById("passInput").value;
+
+        if (nombre === "" || password === "") {
+            alert("Por favor, ingresa nombre y contraseña.");
+            return;
+        }
+
+        let correoSecreto = nombre.replace(/\s+/g, '') + "@rol.com";
+
+        if (accion === 'registrar') {
+            createUserWithEmailAndPassword(auth, correoSecreto, password)
+                .then(() => alert("¡Cuenta de " + nombre + " creada con éxito! Ahora dale a Entrar."))
+                .catch((error) => {
+                    alert("Mensaje de Firebase: " + error.message);
+                });
+        } else {
+            signInWithEmailAndPassword(auth, correoSecreto, password)
+                .catch((error) => alert("Error al entrar: " + error.message));
+        }
+    };
+
+    window.agregarUsuarioActivo = function(nombreJugador) {
+        let contenedorLista = document.getElementById("listaUsuariosActivos");
+        contenedorLista.innerHTML = ''; 
+        let nuevoUsuario = document.createElement("li");
+        nuevoUsuario.innerHTML = `
+            <img src="broche.jpeg" class="avatar">
+            <span>${nombreJugador}</span>
+            <div class="online-dot"></div>
+        `;
+        contenedorLista.appendChild(nuevoUsuario);
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById("panelAuth").style.display = "none";
+            let nombreLimpio = user.email.split('@')[0];
+            agregarUsuarioActivo(nombreLimpio);
+        } else {
+            document.getElementById("panelAuth").style.display = "block";
+            document.getElementById("listaUsuariosActivos").innerHTML = '';
+        }
+    });
+</script>
+</body>
+</html>
