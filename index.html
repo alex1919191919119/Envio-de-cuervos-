@@ -163,9 +163,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-    // Configuración exacta de tu Firebase
+    // Tu llave oficial ya integrada
     const firebaseConfig = {
-        apiKey: "AIzaSyAK2zidlUykm3J86-e_AM5JCswvFznyE-A",,
+        apiKey: "AIzaSyAK2zidlUykm3J86-e_AM5JCswvFznyE-A",
         authDomain: "consejo-4d810.firebaseapp.com",
         projectId: "consejo-4d810",
         storageBucket: "consejo-4d810.firebasestorage.app",
@@ -207,7 +207,10 @@
 
         if (accion === 'registrar') {
             createUserWithEmailAndPassword(auth, correoSecreto, password)
-                .then(() => alert("¡Cuenta de " + nombre + " creada con éxito! Ahora dale a Entrar."))
+                .then(() => {
+                    alert("¡Cuenta creada con éxito, " + nombre + "!");
+                    return signInWithEmailAndPassword(auth, correoSecreto, password);
+                })
                 .catch((error) => {
                     alert("Mensaje de Firebase: " + error.message);
                 });
