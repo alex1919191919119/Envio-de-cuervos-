@@ -6,7 +6,6 @@
     <title>Consejo Negro RPG - La Casa del Dragón</title>
     <style>
         body { 
-            /* Fondo elegante con degradado Targaryen */
             background: radial-gradient(circle at top center, #3a0808 0%, #050505 100%);
             background-attachment: fixed;
             color: #d4af37; 
@@ -18,7 +17,6 @@
         
         .main-container { display: flex; width: 100%; }
         
-        /* Paneles semi-transparentes para que luzca el fondo */
         .main-content { 
             width: 70%; 
             padding: 30px; 
@@ -120,7 +118,6 @@
 <body>
 
 <div class="main-container">
-    <!-- Lado Izquierdo -->
     <div class="main-content">
         <h1 class="header-title">El consejo negro</h1>
         
@@ -142,7 +139,6 @@
         </div>
     </div>
 
-    <!-- Lado Derecho -->
     <div class="sidebar">
         <div class="auth-panel" id="panelAuth">
             <h3 style="color: #d4af37; border: none; margin-top: 0;">Acceso a la sala</h3>
@@ -159,17 +155,15 @@
 
         <h3>Usuarios conectados</h3>
         <ul class="player-list" id="listaUsuariosActivos">
-            <!-- Se llena desde Firebase -->
         </ul>
     </div>
 </div>
 
-<!-- Lógica de Firebase y JavaScript -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-    // Tus llaves secretas de Firebase
+    // Configuración exacta de tu Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyAK2zidLUykm3J86-e_AM5JCswvFznyE-A",
         authDomain: "consejo-4d810.firebaseapp.com",
