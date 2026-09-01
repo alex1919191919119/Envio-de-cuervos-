@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consejo Negro RPG - Estrategia Total</title>
+    <style>
+        body { background: radial-gradient(circle at top center, #3a0808 0%, #050505 100%); color: #d4af37; font-family: 'Georgia', serif; margin: 0; display: flex; min-height: 100vh; }
+        .main-container { display: flex; width: 100%; flex-direction: row; }
+        .main-content { width: 70%; padding: 20px; overflow-y: auto; background-color: rgba(10, 10, 10, 0.6); }
+        .header-title { text-align: center; color: #b22222; font-size: 2.4em; letter-spacing: 2px; text-shadow: 2px 2px 5px #000; margin-top: 0; }
+        .tab-menu { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { background-color: #1a0303; color: #d4af37; border: 1px solid #8b0000; padding: 10px 20px; cursor: pointer; font-family: 'Georgia', serif; font-weight: bold; border-radius: 5px; transition: 0.3s; }
+        .tab-btn.active, .tab-btn:hover { background-color: #8b0000; color: white; box-shadow: 0 0 10px #8b0000; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .visual-display { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .visual-display img { width: 100%; height: 200px; object-fit: cover; border: 2px solid #8b0000; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .westeros-map-panel { background: linear-gradient(145deg, #180303, #0d0d0d); border: 2px solid #8b0000; border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: center; }
+        .map-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+        .region-card { background-color: rgba(20, 20, 20, 0.8); border: 1px solid #d4af37; padding: 8px; border-radius: 5px; font-size: 0.8em; text-align: center; }
+        .region-card b { color: #ff6b6b; display: block; margin-bottom: 3px; }
+        .raven-system, .spy-system, .war-system, .bank-system, .house-management, .chat-casa-system, .tactical-engine { background: linear-gradient(145deg, #1f0505, #111); border: 1px solid #8b0000; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+        .raven-system select, .raven-system button, .raven-system textarea, .spy-system textarea, .spy-system button, .war-system input, .war-system select, .war-system button, .bank-system input, .bank-system select, .bank-system button, .house-management input, .house-management select, .house-management button, .chat-casa-system textarea, .chat-casa-system button, .tactical-engine select, .tactical-engine button, .auth-panel input, .auth-panel select { padding: 10px; font-size: 15px; margin: 8px 0; background-color: #050505; color: #d4af37; border: 1px solid #d4af37; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        .raven-system button, .spy-system button, .war-system button, .bank-system button, .house-management button, .chat-casa-system button, .tactical-engine button { width: auto; font-weight: bold; cursor: pointer; }
+        .raven-system button:hover, .spy-system button:hover, .war-system button:hover, .bank-system button:hover, .house-management button:hover, .chat-casa-system button:hover, .tactical-engine button:hover { background-color: #8b0000; color: white; }
+        .sidebar { width: 30%; background-color: rgba(15, 15, 15, 0.85); border-left: 2px solid #8b0000; padding: 20px; overflow-y: auto; }
+        .sidebar h3 { text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.2em; text-shadow: 1px 1px 3px #000; margin-top:0; }
+        .player-list { list-style: none; padding: 0; }
+        .player-list li { display: flex; align-items: center; background: linear-gradient(90deg, #1f0505, #1a1a1a); padding: 8px; margin-bottom: 8px; border-radius: 5px; border: 1px solid #333; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d4af37; margin-right: 12px; object-fit: cover; }
+        .online-dot { width: 10px; height: 10px; background-color: #00ff00; border-radius: 50%; margin-left: auto; box-shadow: 0 0 8px #00ff00; }
+        .auth-panel { background: linear-gradient(145deg, #2a0808, #111); padding: 15px; border-radius: 8px; margin-top: 10px; text-align: center; border: 1px solid #8b0000; margin-bottom: 20px; }
+        .auth-btn { width: 48%; padding: 8px; margin: 5px 1%; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-login { background-color: #333; color: white; border: 1px solid #555; }
+        .btn-register { background-color: #8b0000; color: white; border: 1px solid #ff4c4c; }
+        .btn-logout { background-color: #4a0000; color: #ff6b6b; border: 1px solid #ff6b6b; width: 100%; margin-top: 10px; }
+        .feed-global, .history-box, .chat-box { background-color: rgba(20, 5, 5, 0.9); border: 1px dashed #d4af37; padding: 12px; border-radius: 6px; max-height: 180px; overflow-y: auto; text-align: left; font-size: 0.9em; }
+        .cuervo-activo-card { background: rgba(40, 10, 10, 0.95); border: 1px solid #ff4c4c; padding: 10px; margin-bottom: 8px; border-radius: 5px; }
+        @media (max-width: 768px) { .main-container { flex-direction: column; } .main-content, .sidebar { width: 100%; } .sidebar { border-left: none; border-top: 2px solid #8b0000; } .map-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="main-content">
+        <h1 class="header-title">El consejo negro</h1>
+        
+        <!-- Pestañas -->
+        <div class="tab-menu">
+            <button class="tab-btn active" onclick="cambiarPestaña('mapaTab', this)">🗺️ Mapa & Guerra</button>
+            <button class="tab-btn" onclick="cambiarPestaña('casaTab', this)">🏰 Casa & Alianzas</button>
+            <button class="tab-btn" onclick="cambiarPestaña('tacticaTab', this)">⚔️ Motor Táctico</button>
+        </div>
+
+        <!-- PESTAÑA 1: MAPA Y CUERVOS -->
+        <div id="mapaTab" class="tab-content active">
+            <div class="visual-display">
+                <img src="banderas.jpeg" alt="Banderas Facciones">
+                <img src="estandartes.jpeg" alt="Estandartes de las Casas">
+                <img src="tapiz.jpeg" alt="Tapiz de Poniente" style="grid-column: span 2; height: 130px;"> 
+            </div>
+
+            <div class="westeros-map-panel">
+                <h2 style="color: #b22222; margin-top: 0; font-size: 1.5em;">🗺️ Mapa Táctico Extendido</h2>
+                <div class="map-grid">
+                    <div class="region-card"><b>Rocadragón</b>Bastión Negro</div>
+                    <div class="region-card"><b>Desembarco del Rey (Puerto)</b>Capital Naval</div>
+                    <div class="region-card"><b>Marcaderiva (Puerto)</b>Flota Velaryon</div>
+                    <div class="region-card"><b>Harrenhal</b>Bastión Disputado</div>
+                    <div class="region-card"><b>Invernalia</b>El Norte (Stark)</div>
+                    <div class="region-card"><b>Aguasdulces</b>Tierras de los Ríos</div>
+                    <div class="region-card"><b>Nido de Águilas</b>El Valle (Arryn)</div>
+                    <div class="region-card"><b>Roca Casterly (Puerto)</b>Oeste (Lannister)</div>
+                    <div class="region-card"><b>Pyke (Puerto)</b>Islas del Hierro</div>
+                    <div class="region-card"><b>Altojardín</b>El Dominio</div>
+                    <div class="region-card"><b>Oldtown (Puerto)</b>Poder Hightower</div>
+                    <div class="region-card"><b>Lanza del Sol (Puerto)</b>Dorne (Martell)</div>
+                </div>
+            </div>
+
+            <div class="raven-system">
+                <h2>Enviar cuervo mensajero secreto</h2>
+                <select id="regionOrigen">
+                    <option value="Rocadragón">Desde: Rocadragón</option>
+                    <option value="Desembarco del Rey">Desde: Desembarco del Rey</option>
+                    <option value="Marcaderiva">Desde: Marcaderiva</option>
+                    <option value="Harrenhal">Desde: Harrenhal</option>
+                    <option value="Invernalia">Desde: Invernalia</option>
+                    <option value="Oldtown">Desde: Oldtown</option>
+                    <option value="Essos">Desde: Essos</option>
+                </select>
+                <select id="rutaCuervo">
+                    <option value="300|0.1">Ruta Segura (5 min | 10% riesgo)</option>
+                    <option value="180|0.5">Ruta Rápida (3 min | 50% riesgo)</option>
+                    <option value="30|0.8">Territorio Enemigo (30 seg | 80% riesgo)</option>
+                </select>
+                <select id="destinatarioCuervoSelect"></select>
+                <textarea id="textoCuervo" rows="2" placeholder="Mensaje estrictamente privado..."></textarea>
+                <button id="btnCuervo">Liberar cuervo táctico</button>
+            </div>
+
+            <div class="spy-system">
+                <h2 style="color: #b22222; font-size: 1.3em;">🕷️ Murmullo de las Arañas</h2>
+                <textarea id="textoRumor" rows="2" placeholder="Escribe tu rumor anónimo..."></textarea>
+                <button id="btnEnviarRumor">Susurrar rumor</button>
+            </div>
+
+            <div class="raven-system" id="panelHistorial" style="display:none;">
+                <h3 style="color: #d4af37; margin-top: 0;">📜 Tus Pergaminos Privados</h3>
+                <div class="history-box" id="listaHistorialPersonal"><p style="color:#777;text-align:center;">Vacío...</p></div>
+            </div>
+
+            <div class="raven-system">
+                <h3>Cielo de Poniente (Vuelos y Eventos)</h3>
+                <div class="feed-global" id="feedEventos"><p style="color:#777;text-align:center;">Cielo despejado...</p></div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: CONTROL DE CASA Y FLOTAS -->
+        <div id="casaTab" class="tab-content">
+            <div class="bank-system" id="panelBancoHierro" style="display:none;">
+                <h2 style="color: #c0c0c0; font-size: 1.3em;">🏛️ Banco de Hierro de Braavos</h2>
+                <select id="faccionPrestamo">
+                    <option value="Los Negros">Los Negros</option>
+                    <option value="Los Verdes">Los Verdes</option>
+                    <option value="Facción Hightower">Facción Hightower</option>
+                    <option value="Casa Stark">Casa Stark</option>
+                    <option value="Casa Tully">Casa Tully</option>
+                    <option value="La Triarquía">La Triarquía</option>
+                </select>
+                <input type="number" id="montoPrestamo" value="5000" step="500">
+                <button id="btnOtorgarPrestamo">💰 Otorgar Préstamo</button>
+            </div>
+
+            <div class="war-system" id="panelGuerra" style="display:none;">
+                <h2 style="color: #b22222; font-size: 1.3em;">⚔️ Cuartel de Guerra, Tropas y Barcos</h2>
+                <p id="infoTesoroCasa" style="color: #ffd43b; font-weight: bold; margin: 0;"></p>
+                <p id="infoLimiteTropas" style="font-size: 0.85em; color: #ff9999; margin: 0;"></p>
+                <p id="infoLimiteBarcos" style="font-size: 0.85em; color: #63e6be; margin: 0; margin-bottom: 10px;"></p>
+                
+                <div id="avisoNoLider" style="color: #ff6b6b; font-size: 0.9em; display:none;">⚠️ Solo la Cabeza de Casa declara marchas.</div>
+                
+                <div id="comandanteControles">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left;">
+                        <div><label>Caballeros:</label><input type="number" id="tropasCaballeros" value="500"></div>
+                        <div><label>Infantería:</label><input type="number" id="tropasInfanteria" value="4000"></div>
+                        <div><label>Arqueros:</label><input type="number" id="tropasArqueros" value="1500"></div>
+                        <div><label>Barcos Guerra:</label><input type="number" id="barcosGuerra" value="20"></div>
+                        <div style="grid-column: span 2;">
+                            <label>Destino Táctico / Puerto:</label>
+                            <select id="destinoMarcha">
+                                <option value="Marcaderiva (Puerto)">Marcaderiva (Puerto)</option>
+                                <option value="Desembarco del Rey (Puerto)">Desembarco del Rey (Puerto)</option>
+                                <option value="Pyke (Puerto)">Pyke (Puerto)</option>
+                                <option value="Oldtown (Puerto)">Oldtown (Puerto)</option>
+                                <option value="Harrenhal">Harrenhal</option>
+                                <option value="Aguasdulces">Aguasdulces</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="btnMarcha" style="margin-top: 10px;">📢 Desplegar Marcha / Flota</button>
+                </div>
+            </div>
+
+            <div class="chat-casa-system" id="panelChatCasa" style="display:none;">
+                <h2 style="color: #d4af37; font-size: 1.2em;">💬 Canal Privado de la Casa</h2>
+                <div class="chat-box" id="listaChatCasa"><p style="color: #777; text-align: center;">Vacío...</p></div>
+                <textarea id="textoChatCasa" rows="2" placeholder="Mensaje para tus aliados..."></textarea>
+                <button id="btnEnviarChatCasa">Enviar a la Casa</button>
+            </div>
+
+            <div class="house-management" id="panelAlianzas" style="display:none;">
+                <h2 style="color: #d4af37; font-size: 1.2em;">🤝 Alianzas Diplomáticas</h2>
+                <select id="selectCasasDisponibles"></select>
+                <button id="btnEnviarAlianza" style="background: #333; color: #d4af37; border: 1px solid #d4af37;">📜 Proponer Alianza</button>
+                <div id="listaAlianzasActivas" style="font-size: 0.85em; color: #ddd; margin-top: 10px;"></div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3: MOTOR TÁCTICO -->
+        <div id="tacticaTab" class="tab-content">
+            <div class="tactical-engine">
+                <h2 style="color: #ff4c4c; font-size: 1.4em;">⚔️ Simulador de Batalla (30 Decisiones)</h2>
+                <label style="color:#d4af37; display:block; text-align:left;">Contexto del Enfrentamiento:</label>
+                <select id="selectContextoBatalla" onchange="actualizarDecisionTactica()">
+                    <option value="naval">🌊 Batalla Naval (Flotas en alta mar / Puertos)</option>
+                    <option value="dragon">🐉 Combate Aéreo con Dragones</option>
+                    <option value="asedio">🏰 Asedio a Ciudad o Castillo</option>
+                    <option value="tierra">🛡️ Batalla Campal (Campo Abierto)</option>
+                </select>
+
+                <div id="contenedorDecisionDinamica" style="margin-top: 15px; text-align: left; background: rgba(10,2,2,0.8); padding: 12px; border-radius: 6px; border: 1px solid #8b0000;"></div>
+
+                <button id="btnEjecutarTactica" style="margin-top: 12px; background: #8b0000; color: white;">🎯 Ejecutar Maniobra Táctica</button>
+                <div id="resultadoTacticoBox" style="margin-top: 15px; font-size: 0.95em; color: #ffd43b; text-align: left; padding: 10px; background: #050505; display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="auth-panel" id="panelAuth"></div>
+        <h3>Usuarios conectados</h3>
+        <ul class="player-list" id="listaUsuariosActivos"></ul>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, updateDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAK2zidlUykm3J86-e_AM5JCswvFznyE-A", authDomain: "consejo-4d810.firebaseapp.com", projectId: "consejo-4d810", storageBucket: "consejo-4d810.firebasestorage.app", messagingSenderId: "1062967101002", appId: "1:1062967101002:web:03940dc1f4ff3abf0c88b3" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let usuarioActual = null;
+    let datosPerfilActual = null;
+
+    const limitesFac = {
+        "Los Negros (Targaryen/Velaryon)": { cab: 1200, inf: 15000, arq: 4000, barcos: 250 },
+        "Los Verdes (Targaryen)": { cab: 1500, inf: 18000, arq: 5000, barcos: 80 },
+        "Facción Hightower": { cab: 1000, inf: 12000, arq: 3500, barcos: 60 },
+        "Casa Stark": { cab: 800, inf: 20000, arq: 6000, barcos: 20 },
+        "Casa Tully": { cab: 600, inf: 10000, arq: 3000, barcos: 15 },
+        "Casa Lannister": { cab: 1500, inf: 15000, arq: 4000, barcos: 50 },
+        "Casa Arryn": { cab: 1000, inf: 12000, arq: 4000, barcos: 30 },
+        "Casa Greyjoy": { cab: 200, inf: 8000, arq: 2000, barcos: 120 },
+        "Casa Tyrell": { cab: 2000, inf: 25000, arq: 7000, barcos: 90 },
+        "Casa Martell": { cab: 1000, inf: 12000, arq: 4000, barcos: 40 },
+        "La Triarquía": { cab: 500, inf: 15000, arq: 5000, barcos: 300 }
+    };
+
+    const bancoDecisiones = {
+        naval: ["⛵ Maniobra envolvente con drakars ligeros aprovechando el viento.", "🔥 Uso de fuego afgand lanzado desde barcos torre.", "⚓ Abordaje directo cuerpo a cuerpo.", "🐉 Apoyo aéreo de dragón sobre la flota.", "🛡️ Formación defensiva bloqueando el puerto.", "🌊 Atraer al enemigo a aguas poco profundas.", "🏹 Lluvia de flechas incendiarias sobre las velas enemigas.", "⛓️ Tender cadenas subacuáticas en la bahía."],
+        dragon: ["🔥 Ataque en pinza desde el sol para cegar al rival.", "🌪️ Picada en barrena para intentar destrozar un ala.", "🛡️ Esquive ágil y vuelo a ras de suelo.", "🎯 Fuego terrestre concentrado de ballistas (Escorpiones).", "🌫️ Ocultarse entre nubes y lanzar llamas sorpresa."],
+        asedio: ["⚓ ¡TOMAR EL PUERTO! Bloqueo naval total de la ciudad.", "🪨 Bombardeo con trebuchets a las murallas.", "🪜 Asalto nocturno escalando en silencio.", "⛏️ Zapadores cavando bajo los cimientos.", "🚪 Embestir las puertas con ariete cubierto.", "💧 Cortar el suministro de agua del acueducto."],
+        tierra: ["🐎 Carga de caballería pesada en cuña (Rompe filas).", "🛡️ Muro de escudos y falange de piqueros.", "🏹 Lluvia de flechas en parábola.", "🌲 Emboscada desde los bosques laterales.", "🚩 Falsa retirada táctica atrayendo al enemigo."]
+    };
+
+    window.solicitarPermisoNotificaciones = function() {
+        if ("Notification" in window) {
+            Notification.requestPermission().then(p => {
+                if (p === "granted") { alert("¡Alertas activadas!"); new Notification("Aviso", {body:"Sistema listo."}); }
+            });
+        }
+    }
+
+    function dispararNoti(titulo, cuerpo) { if("Notification" in window && Notification.permission==="granted") new Notification(titulo, {body: cuerpo, icon:"broche.jpeg"}); }
+
+    window.cambiarPestaña = function(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+        let t = document.getElementById(tabId);
+        if(t) t.classList.add('active');
+        if(btn) btn.classList.add('active');
+        if(tabId === 'tacticaTab') actualizarDecisionTactica();
+    }
+
+    window.manejarCambioCasa = function(v) {
+        let dm = document.getElementById("divCasaManual");
+        if(dm) dm.style.display = (v === "CREAR_CASA_MANUAL") ? "block" : "none";
+    }
+
+    const listaDragonesOficiales = ["Syrax", "Caraxes", "Meleys", "Vermax", "Arrax", "Tyraxes", "Stormcloud", "Moondancer", "Seasmoke", "Vermithor", "Silverwing", "Morning", "Sunfyre", "Vhagar", "Dreamfyre", "Tessarion", "El Caníbal", "Robaojas", "Fantasmas Gris"];
+
+    window.actualizarSelectDragones = async function(idSel, actual="") {
+        let sel = document.getElementById(idSel);
+        if(!sel) return;
+        sel.innerHTML = '<option value="ninguno">Sin Dragón</option>';
+        let ocupados = [];
+        let qs = await getDocs(collection(db, "perfilesRol"));
+        qs.forEach(d => { let dt = d.data(); if(dt.tieneDragon==="si" && dt.nombreDragon && dt.nombreDragon!==actual) ocupados.push(dt.nombreDragon); });
+        
+        listaDragonesOficiales.forEach(dr => {
+            let opt = document.createElement("option");
+            opt.value = dr;
+            if(dr === actual) { opt.innerText = `🔥 ${dr} (Tuyo)`; opt.selected = true; }
+            else if(ocupados.includes(dr)) { opt.innerText = `❌ ${dr} (Ocupado)`; opt.disabled = true; }
+            else { opt.innerText = `🔥 ${dr} (Libre)`; }
+            sel.appendChild(opt);
+        });
+        
+        let oc = document.createElement("option");
+        oc.value = "OC_CUSTOM";
+        if(actual && !listaDragonesOficiales.includes(actual) && actual!=="ninguno") { oc.innerText = `✨ ${actual} (OC)`; oc.selected = true; }
+        else { oc.innerText = "✨ Crear Dragón OC"; }
+        sel.appendChild(oc);
+    }
+
+    window.verificarSeleccionDragon = function(sId, cId) {
+        let sel = document.getElementById(sId)?.value;
+        let d = document.getElementById(cId);
+        if(d) d.style.display = (sel === "OC_CUSTOM") ? "block" : "none";
+    }
+
+    window.subirImagenLocal = function(input, cb) {
+        let file = input.files[0];
+        if(!file) return cb(null);
+        let r = new FileReader();
+        r.onload = e => cb(e.target.result);
+        r.readAsDataURL(file);
+    }
+
+    window.actualizarDecisionTactica = function() {
+        let ctx = document.getElementById("selectContextoBatalla")?.value || "naval";
+        let cont = document.getElementById("contenedorDecisionDinamica");
+        if(!cont) return;
+        cont.innerHTML = `<label style="color:#ffd43b; font-size:0.9em; display:block;">Maniobra táctica:</label>`;
+        let list = bancoDecisiones[ctx] || bancoDecisiones.tierra;
+        let sel = document.createElement("select");
+        sel.id = "selectDecisionElegida";
+        list.forEach(t => { let o = document.createElement("option"); o.value = t; o.innerText = t; sel.appendChild(o); });
+        cont.appendChild(sel);
+    }
+
+    document.getElementById("btnEjecutarTactica")?.addEventListener("click", async () => {
+        if (!datosPerfilActual) return;
+        let dec = document.getElementById("selectDecisionElegida")?.value;
+        if(!dec) return;
+        let dr = datosPerfilActual.tieneDragon === "si" ? ` Apoyado por [${datosPerfilActual.nombreDragon}].` : "";
+        let txt = `⚔️ [TÁCTICA]: Casa ${datosPerfilActual.casa} (${datosPerfilActual.nombre}) ejecutó: "${dec}".${dr}`;
+        await addDoc(collection(db, "eventos"), { texto: txt, tipo: "exito", timestamp: serverTimestamp() });
+        let bx = document.getElementById("resultadoTacticoBox");
+        if(bx) { bx.style.display = "block"; bx.innerHTML = `✅ ${txt}`; }
+    });
+
+    document.getElementById("btnEnviarChatCasa")?.addEventListener("click", async () => {
+        if (!datosPerfilActual) return;
+        let tx = document.getElementById("textoChatCasa")?.value.trim();
+        if(!tx) return;
+        await addDoc(collection(db, "chatCasa"), { casa: datosPerfilActual.casa, remitente: datosPerfilActual.nombre, texto: tx, timestamp: serverTimestamp() });
+        document.getElementById("textoChatCasa").value = "";
+    });
+
+    document.getElementById("btnEnviarAlianza")?.addEventListener("click", async () => {
+        if (!datosPerfilActual) return;
+        let dest = document.getElementById("selectCasasDisponibles")?.value;
+        if(!dest) return;
+        await addDoc(collection(db, "alianzas"), { casaOrigen: datosPerfilActual.casa, casaDestino: dest, estado: "pendiente", timestamp: serverTimestamp() });
+        await addDoc(collection(db, "eventos"), { texto: `🤝 [DIPLOMACIA]: [${datosPerfilActual.casa}] propuso alianza a [${dest}].`, tipo: "info", timestamp: serverTimestamp() });
+        alert("Enviado.");
+    });
+
+    window.aceptarAlianza = async function(idA, orig, dest) {
+        await updateDoc(doc(db, "alianzas", idA), { estado: "activa" });
+        await addDoc(collection(db, "eventos"), { texto: `⚔️ ¡PACTO SELLADO! Alianza formal entre [${orig}] y [${dest}].`, tipo: "exito", timestamp: serverTimestamp() });
+    }
+
+    document.getElementById("btnMarcha")?.addEventListener("click", async () => {
+        if (!datosPerfilActual || datosPerfilActual.rango !== "Líder (Cabeza de Casa)") return alert("Solo el líder.");
+        let c = parseInt(document.getElementById("tropasCaballeros")?.value||0), i = parseInt(document.getElementById("tropasInfanteria")?.value||0), a = parseInt(document.getElementById("tropasArqueros")?.value||0), b = parseInt(document.getElementById("barcosGuerra")?.value||0);
+        let lim = limitesFac[datosPerfilActual.casa] || { cab:1000, inf:10000, arq:3000, barcos:40 };
+        if(c>lim.cab || i>lim.inf || a>lim.arq || b>lim.barcos) return alert(`Límite superado. Máx: ${lim.cab} Cab, ${lim.inf} Inf, ${lim.arq} Arq, ${lim.barcos} Barcos.`);
+        
+        let dest = document.getElementById("destinoMarcha")?.value;
+        let dr = datosPerfilActual.tieneDragon === "si" ? ` Dragón: [${datosPerfilActual.nombreDragon}].` : "";
+        let txt = `⚔️ ¡DESPLIEGUE DE ${datosPerfilActual.casa.toUpperCase()}! ${datosPerfilActual.nombre} moviliza ${b} barcos y tropas hacia [${dest}].${dr}`;
+        await addDoc(collection(db, "eventos"), { texto: txt, tipo: "peligro", timestamp: serverTimestamp() });
+        dispararNoti("¡Guerra!", txt);
+        alert("Desplegado.");
+    });
+
+    document.getElementById("btnCuervo")?.addEventListener("click", async () => {
+        if (!datosPerfilActual) return;
+        let ori = document.getElementById("regionOrigen")?.value, rut = document.getElementById("rutaCuervo")?.value.split('|');
+        let dest = document.getElementById("destinatarioCuervoSelect")?.value, msg = document.getElementById("textoCuervo")?.value.trim();
+        if(!msg || dest==="Reino") return alert("Selecciona destinatario y mensaje.");
+        await addDoc(collection(db, "cuervosVuelo"), { remitente: datosPerfilActual.nombre, origen: ori, destinatario: dest, mensaje: msg, riesgo: parseFloat(rut[1]), tiempoTermino: Date.now()+(parseInt(rut[0])*1000), estado: "en_vuelo" });
+        await addDoc(collection(db, "eventos"), { texto: `🕊️ Cuervo secreto en vuelo desde [${ori}] hacia [${dest}].`, tipo: "info", timestamp: serverTimestamp() });
+        document.getElementById("textoCuervo").value = "";
+        alert("Cuervo liberado.");
+    });
+
+    window.intentarDerribar = async function(cid, rsg, rem, dest, ori, msgSec) {
+        if(!datosPerfilActual || datosPerfilActual.nombre===rem) return;
+        if(Math.random() < rsg) {
+            await updateDoc(doc(db, "cuervosVuelo", cid), { estado: "derribado" });
+            await addDoc(collection(db, "historialPrivado"), { propietario: datosPerfilActual.nombre, texto: `🎯 [INTERCEPTADO de ${rem} a ${dest}]: "${msgSec}"`, timestamp: serverTimestamp() });
+            await addDoc(collection(db, "eventos"), { texto: `🩸 ¡SABOTAJE! ${datosPerfilActual.nombre} interceptó el cuervo de ${rem} para ${dest}.`, tipo: "peligro", timestamp: serverTimestamp() });
+            dispararNoti("¡Interceptado!", "Leíste el mensaje secreto.");
+        } else {
+            await addDoc(collection(db, "eventos"), { texto: `🛡️ ${datosPerfilActual.nombre} falló al intentar cazar el cuervo de ${rem}.`, tipo: "exito", timestamp: serverTimestamp() });
+        }
+    };
+
+    async function cargarDatosPerfil(user) { let d = await getDoc(doc(db, "perfilesRol", user.uid)); if(d.exists()) datosPerfilActual = d.data(); }
+
+    function renderizarPanelAuth(user, perfil) {
+        let pAuth = document.getElementById("panelAuth");
+        let aReq = ["panelCuervo", "panelEspias", "panelHistorial", "panelGuerra", "panelChatCasa", "panelAlianzas"];
+        if(user) {
+            aReq.forEach(id => { let e = document.getElementById(id); if(e) e.style.display="block"; });
+            let nm = perfil?perfil.nombre:(user.displayName||"Personaje"), ft = perfil&&perfil.foto?perfil.foto:"broche.jpeg";
+            let c = perfil?perfil.casa:"Independiente", rg = perfil?perfil.rango:"Miembro";
+            let di = perfil&&perfil.tieneDragon==="si"?`🐉 ${perfil.nombreDragon}`:"Sin dragón";
+            let dn = perfil&&perfil.nombreDragon?perfil.nombreDragon:"";
+            let lim = limitesFac[c] || { cab:1000, inf:10000, arq:3000, barcos:40 };
+            
+            let idL = document.getElementById("infoLimiteTropas"); if(idL) idL.innerText = `🛡️ Máx ${lim.cab} Cab | ${lim.inf} Inf | ${lim.arq} Arq`;
+            let ibL = document.getElementById("infoLimiteBarcos"); if(ibL) ibL.innerText = `⛵ Máx ${lim.barcos} Barcos`;
+            let avL = document.getElementById("avisoNoLider"), cmC = document.getElementById("comandanteControles");
+            if(rg==="Líder (Cabeza de Casa)"){ if(avL) avL.style.display="none"; if(cmC) cmC.style.display="block"; } 
+            else { if(avL) avL.style.display="block"; if(cmC) cmC.style.display="none"; }
+
+            pAuth.innerHTML = `
+                <img src="${ft}" class="avatar" style="width:70px; height:70px; margin:0 auto 10px; display:block;" onerror="this.src='broche.jpeg'">
+                <p style="margin:5px 0; font-weight:bold;">${nm}</p>
+                <p style="margin:3px 0; font-size:0.85em; color:#ff6b6b;">🏠 ${c} <br><b>${rg}</b></p>
+                <p style="margin:3px 0; font-size:0.85em; color:#63e6be;">${di}</p>
+                <div style="margin-top:15px; border-top:1px solid #444; padding-top:10px; text-align:left;">
+                    <label style="font-size:0.8em; color:#aaa;">Modificar Nombre:</label>
+                    <input type="text" id="editNombre" value="${nm}">
+                    <label style="font-size:0.8em; color:#aaa;">Modificar Casa:</label>
+                    <select id="editCasa" onchange="manejarCambioCasa(this.value)">
+                        <option value="Los Negros (Targaryen/Velaryon)" ${c.includes("Negros")?"selected":""}>Los Negros (Targaryen/Velaryon)</option>
+                        <option value="Los Verdes (Targaryen)" ${c.includes("Verdes")?"selected":""}>Los Verdes (Targaryen)</option>
+                        <option value="Facción Hightower" ${c.includes("Hightower")?"selected":""}>Facción Hightower</option>
+                        <option value="Casa Stark" ${c.includes("Stark")?"selected":""}>Casa Stark</option>
+                        <option value="Casa Tully" ${c.includes("Tully")?"selected":""}>Casa Tully</option>
+                        <option value="Casa Lannister" ${c.includes("Lannister")?"selected":""}>Casa Lannister</option>
+                        <option value="Casa Arryn" ${c.includes("Arryn")?"selected":""}>Casa Arryn</option>
+                        <option value="Casa Greyjoy" ${c.includes("Greyjoy")?"selected":""}>Casa Greyjoy</option>
+                        <option value="Casa Tyrell" ${c.includes("Tyrell")?"selected":""}>Casa Tyrell</option>
+                        <option value="Casa Martell" ${c.includes("Martell")?"selected":""}>Casa Martell</option>
+                        <option value="La Triarquía" ${c.includes("Triarquía")?"selected":""}>La Triarquía</option>
+                        <option value="CREAR_CASA_MANUAL">✨ Crear Casa Manualmente</option>
+                    </select>
+                    <div id="divCasaManual" style="display:none;"><input type="text" id="casaManualInput" placeholder="Nombre de Casa..."></div>
+                    <select id="editRango" style="margin-top:5px;">
+                        <option value="Líder (Cabeza de Casa)" ${rg.includes("Líder")?"selected":""}>Líder (Cabeza de Casa)</option>
+                        <option value="Heredero / Consorte" ${rg.includes("Heredero")?"selected":""}>Heredero / Consorte</option>
+                        <option value="Familiar / Miembro" ${rg.includes("Miembro")?"selected":""}>Familiar / Miembro</option>
+                    </select>
+                    <select id="editTieneDragon" onchange="let v=this.value==='si'; document.getElementById('editDivDragon').style.display=v?'block':'none'; if(v) actualizarSelectDragones('editSelectDragon', '${dn}');">
+                        <option value="no" ${perfil&&perfil.tieneDragon==='no'?'selected':''}>Sin Dragón</option>
+                        <option value="si" ${perfil&&perfil.tieneDragon==='si'?'selected':''}>Posee Dragón</option>
+                    </select>
+                    <div id="editDivDragon" style="display:${perfil&&perfil.tieneDragon==='si'?'block':'none'};">
+                        <select id="editSelectDragon" onchange="verificarSeleccionDragon('editSelectDragon', 'editDivDragonCustom')"></select>
+                        <div id="editDivDragonCustom" style="display:${!listaDragonesOficiales.includes(dn) && dn?'block':'none'};"><input type="text" id="editDragonCustomInput" value="${!listaDragonesOficiales.includes(dn)?dn:''}" placeholder="Nombre Dragón OC..."></div>
+                    </div>
+                    <label style="font-size:0.8em; color:#aaa; margin-top:5px; display:block;">Foto URL:</label>
+                    <input type="text" id="editFotoUrl" placeholder="https://..." value="${ft.startsWith('http')?ft:''}">
+                    <label style="font-size:0.8em; color:#aaa; margin-top:5px; display:block;">O Galería Local:</label>
+                    <input type="file" id="inputFotoGaleria" accept="image/*" style="font-size:0.8em;">
+                    <button class="auth-btn btn-login" id="btnGuardarCambiosPerfil" style="width:100%; margin-top:10px;">💾 Guardar Cambios</button>
+                </div>
+                <button class="auth-btn btn-logout" id="btnLogout" style="margin-top:12px;">Cerrar sesión</button>
+            `;
+            if(perfil&&perfil.tieneDragon==='si') actualizarSelectDragones('editSelectDragon', dn);
+            document.getElementById("btnGuardarCambiosPerfil").addEventListener("click", async () => {
+                let nn=document.getElementById("editNombre").value.trim(), nc=document.getElementById("editCasa").value, nr=document.getElementById("editRango").value, ntd=document.getElementById("editTieneDragon").value;
+                if(nc==="CREAR_CASA_MANUAL") nc = document.getElementById("casaManualInput").value.trim();
+                let nnd=""; if(ntd==="si"){ let sd=document.getElementById("editSelectDragon").value; nnd=(sd==="OC_CUSTOM")?document.getElementById("editDragonCustomInput").value.trim():sd; }
+                if(!nn) return alert("Nombre vacío.");
+                let fU = document.getElementById("editFotoUrl").value.trim(), iG = document.getElementById("inputFotoGaleria");
+                if(iG.files[0]) {
+                    subirImagenLocal(iG, async (b64) => { await setDoc(doc(db, "perfilesRol", user.uid), { nombre:nn, casa:nc, rango:nr, tieneDragon:ntd, nombreDragon:nnd, foto:b64 }, {merge:true}); location.reload(); });
+                } else {
+                    await setDoc(doc(db, "perfilesRol", user.uid), { nombre:nn, casa:nc, rango:nr, tieneDragon:ntd, nombreDragon:nnd, foto:fU||ft }, {merge:true}); location.reload();
+                }
+            });
+            document.getElementById("btnLogout").addEventListener("click", async () => { await deleteDoc(doc(db, "usuariosActivos", user.uid)); await signOut(auth); });
+        } else {
+            aReq.forEach(id => { let e = document.getElementById(id); if(e) e.style.display="none"; });
+            pAuth.innerHTML = `
+                <h3 style="color:#d4af37; margin-top:0;">Registro / Acceso</h3>
+                <input type="text" id="usuarioInput" placeholder="Nombre">
+                <input type="password" id="passInput" placeholder="Contraseña">
+                <select id="casaInput" onchange="manejarCambioCasa(this.value)">
+                    <option value="Los Negros (Targaryen/Velaryon)">Los Negros (Targaryen/Velaryon)</option>
+                    <option value="Los Verdes (Targaryen)">Los Verdes (Targaryen)</option>
+                    <option value="Facción Hightower">Facción Hightower</option>
+                    <option value="Casa Stark">Casa Stark</option>
+                    <option value="Casa Tully">Casa Tully</option>
+                    <option value="Casa Lannister">Casa Lannister</option>
+                    <option value="Casa Arryn">Casa Arryn</option>
+                    <option value="Casa Greyjoy">Casa Greyjoy</option>
+                    <option value="Casa Tyrell">Casa Tyrell</option>
+                    <option value="Casa Martell">Casa Martell</option>
+                    <option value="La Triarquía">La Triarquía</option>
+                    <option value="CREAR_CASA_MANUAL">✨ Crear Casa Manual</option>
+                </select>
+                <div id="divCasaManual" style="display:none;"><input type="text" id="casaManualInput" placeholder="Ej. Casa Osgrey..."></div>
+                <select id="rangoInput"><option value="Líder (Cabeza de Casa)">Líder (Cabeza de Casa)</option><option value="Heredero / Consorte">Heredero / Consorte</option><option value="Familiar / Miembro">Familiar / Miembro</option></select>
+                <select id="tieneDragonInput" onchange="let v=this.value==='si'; document.getElementById('divDragonSelect').style.display=v?'block':'none'; if(v) actualizarSelectDragones('selectDragonOficial');"><option value="no">Sin Dragón</option><option value="si">Sí</option></select>
+                <div id="divDragonSelect" style="display:none;"><select id="selectDragonOficial" onchange="verificarSeleccionDragon('selectDragonOficial', 'divDragonCustom')"></select><div id="divDragonCustom" style="display:none;"><input type="text" id="dragonCustomInput" placeholder="Dragón OC..."></div></div>
+                <button class="auth-btn btn-login" id="btnLogin">Entrar</button> <button class="auth-btn btn-register" id="btnRegister">Crear cuenta</button>
+            `;
+            document.getElementById("btnLogin").addEventListener("click", () => procAcc('entrar'));
+            document.getElementById("btnRegister").addEventListener("click", () => procAcc('registrar'));
+        }
+    }
+
+    async function procAcc(acc) {
+        let n=document.getElementById("usuarioInput").value.trim(), p=document.getElementById("passInput").value;
+        if(!n||!p) return alert("Llena los campos.");
+        let c = n.replace(/\s+/g,'')+"@rol.com";
+        if(acc==='registrar') {
+            let cs=document.getElementById("casaInput").value; if(cs==="CREAR_CASA_MANUAL") cs=document.getElementById("casaManualInput").value.trim();
+            let rg=document.getElementById("rangoInput").value, td=document.getElementById("tieneDragonInput").value, nd="";
+            if(td==="si"){ let sd=document.getElementById("selectDragonOficial").value; nd=(sd==="OC_CUSTOM")?document.getElementById("dragonCustomInput").value.trim():sd; }
+            try {
+                let u=await createUserWithEmailAndPassword(auth, c, p);
+                await setDoc(doc(db, "perfilesRol", u.user.uid), { nombre:n, casa:cs, rango:rg, tieneDragon:td, nombreDragon:nd, foto:"broche.jpeg" });
+                alert("Creado."); await signInWithEmailAndPassword(auth, c, p);
+            } catch(e){ alert(e.message); }
+        } else {
+            try { await signInWithEmailAndPassword(auth, c, p); } catch(e){ alert(e.message); }
+        }
+    }
+
+    onAuthStateChanged(auth, async (u) => {
+        usuarioActual = u;
+        if(u) { await cargarDatosPerfil(u); renderizarPanelAuth(u, datosPerfilActual); await setDoc(doc(db, "usuariosActivos", u.uid), { nombre: `${datosPerfilActual.nombre} (${datosPerfilActual.casa})`, avatar: datosPerfilActual.foto||"broche.jpeg", lastSeen: serverTimestamp() }); } 
+        else { datosPerfilActual = null; renderizarPanelAuth(null, null); let ls=document.getElementById("listaUsuariosActivos"); if(ls) ls.innerHTML=''; }
+    });
+
+    onSnapshot(collection(db, "usuariosActivos"), (snap) => {
+        let cL = document.getElementById("listaUsuariosActivos"), sD = document.getElementById("destinatarioCuervoSelect"), sA = document.getElementById("selectCasasDisponibles");
+        if(!cL) return; cL.innerHTML=''; if(sD) sD.innerHTML=''; let cSet=new Set();
+        snap.forEach(d => {
+            let dt=d.data(), li=document.createElement("li"), nl=dt.nombre.split(' (')[0], cs=dt.nombre.match(/\((.*?)\)$/)?.[1]||"";
+            if(cs) cSet.add(cs);
+            li.innerHTML = `<img src="${dt.avatar}" class="avatar" onerror="this.src='broche.jpeg'"><span>${dt.nombre}</span><div class="online-dot"></div>`;
+            cL.appendChild(li);
+            if(datosPerfilActual && nl!==datosPerfilActual.nombre && sD){ let o=document.createElement("option"); o.value=nl; o.innerText=dt.nombre; sD.appendChild(o); }
+        });
+        if(sA){ sA.innerHTML='<option value="">Seleccionar Alianza</option>'; cSet.forEach(c=>{ if(datosPerfilActual&&c!==datosPerfilActual.casa){ let o=document.createElement("option"); o.value=c; o.innerText=c; sA.appendChild(o); } }); }
+    });
+
+    onSnapshot(collection(db, "chatCasa"), (snap) => {
+        if(!datosPerfilActual) return; let bx=document.getElementById("listaChatCasa"); if(!bx) return; bx.innerHTML=''; let m=0;
+        snap.forEach(d => { let dt=d.data(); if(dt.casa===datosPerfilActual.casa){ m++; let p=document.createElement("p"); p.style.margin="5px 0"; p.innerHTML=`<b style="color:#ff6b6b">${dt.remitente}:</b> <span style="color:#ffd43b">${dt.texto}</span>`; bx.appendChild(p); } });
+        if(m===0) bx.innerHTML='<p style="color:#777;text-align:center;">Vacío...</p>'; bx.scrollTop=bx.scrollHeight;
+    });
+
+    onSnapshot(collection(db, "alianzas"), (snap) => {
+        if(!datosPerfilActual) return; let bx=document.getElementById("listaAlianzasActivas"); if(!bx) return; bx.innerHTML=''; let a=0;
+        snap.forEach(d => {
+            let dt=d.data(); if(dt.casaOrigen===datosPerfilActual.casa || dt.casaDestino===datosPerfilActual.casa){
+                a++; let dv=document.createElement("div"); dv.style.margin="5px 0";
+                if(dt.estado==="activa") dv.innerHTML=`🛡️ Alianza: <b>${dt.casaOrigen}</b> y <b>${dt.casaDestino}</b>`;
+                else {
+                    if(dt.casaDestino===datosPerfilActual.casa && datosPerfilActual.rango==="Líder (Cabeza de Casa)") dv.innerHTML=`📜 Propuesta de <b>${dt.casaOrigen}</b> <button onclick="aceptarAlianza('${d.id}','${dt.casaOrigen}','${dt.casaDestino}')">Aceptar</button>`;
+                    else dv.innerHTML=`⏳ Pendiente enviada a <b>${dt.casaDestino}</b>`;
+                }
+                bx.appendChild(dv);
+            }
+        });
+        if(a===0) bx.innerHTML='<p style="color:#777;">Sin alianzas...</p>';
+    });
+
+    onSnapshot(collection(db, "cuervosVuelo"), (snap) => {
+        snap.forEach(async (d) => {
+            let dt=d.data(), hr=Date.now(), tr=Math.ceil((dt.tiempoTermino-hr)/1000);
+            if(dt.estado==="en_vuelo" && tr<=0) {
+                if(datosPerfilActual && datosPerfilActual.nombre===dt.destinatario){
+                    await addDoc(collection(db, "historialPrivado"), { propietario:datosPerfilActual.nombre, texto:`📜 De [${dt.remitente}]: "${dt.mensaje}"`, timestamp:serverTimestamp() });
+                    dispararNoti("¡Cuervo Secreto!", `Mensaje de ${dt.remitente}.`);
+                }
+                await addDoc(collection(db, "eventos"), { texto:`🕊️ El cuervo de ${dt.remitente} llegó a [${dt.destinatario}].`, tipo:"exito", timestamp:serverTimestamp() });
+                await deleteDoc(doc(db, "cuervosVuelo", d.id));
+            }
+        });
+    });
+
+    onSnapshot(collection(db, "historialPrivado"), (snap) => {
+        if(!datosPerfilActual) return; let bx=document.getElementById("listaHistorialPersonal"); if(!bx) return; bx.innerHTML=''; let en=0;
+        snap.forEach(d => { let dt=d.data(); if(dt.propietario===datosPerfilActual.nombre){ en++; let p=document.createElement("p"); p.style.margin="6px 0"; p.style.color="#ffd43b"; p.innerText=dt.texto; bx.appendChild(p); } });
+        if(en===0) bx.innerHTML='<p style="color:#777;text-align:center;">Vacío...</p>';
+    });
+
+    onSnapshot(query(collection(db, "eventos"), orderBy("timestamp", "desc")), (sE) => {
+        onSnapshot(collection(db, "cuervosVuelo"), (sC) => {
+            let fd = document.getElementById("feedEventos"); if(!fd) return; fd.innerHTML='';
+            sC.forEach(d => {
+                let dt=d.data(), tr=Math.ceil((dt.tiempoTermino-Date.now())/1000);
+                if(dt.estado==="en_vuelo" && tr>0){
+                    let dv=document.createElement("div"); dv.className="cuervo-activo-card";
+                    dv.innerHTML=`<p style="margin:0 0 5px; color:#ffb7b7; font-weight:bold;">🕊️ Vuelo secreto de <b>${dt.remitente}</b> ➔ <b>[${dt.destinatario}]</b></p><p style="margin:0 0 8px; font-size:0.85em; color:#ffd43b;">⏱️ Restante: <b>${tr}s</b> | Riesgo: ${dt.riesgo*100}%</p><button onclick="intentarDerribar('${d.id}',${dt.riesgo},'${dt.remitente}','${dt.destinatario}','${dt.origen}','${dt.mensaje}')" style="background:#8b0000; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">🎯 Intentar derribar</button>`;
+                    fd.appendChild(dv);
+                }
+            });
+            sE.forEach(d => {
+                let dt=d.data(), p=document.createElement("p"); p.style.margin="6px 0";
+                if(dt.tipo==="peligro") p.style.color="#ff6b6b"; else if(dt.tipo==="exito") p.style.color="#51cf66"; else if(dt.tipo==="rumor") p.style.color="#da77f2"; else p.style.color="#ffd43b";
+                p.innerText=dt.texto; fd.appendChild(p);
+            });
+        });
+    });
+</script>
+</body>
+</html>
